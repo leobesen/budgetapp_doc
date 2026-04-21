@@ -23,8 +23,6 @@ A planilha precisa seguir a estrutura esperada pelo sistema:
 
 - Aba `Menu`
 - Abas `Mapa 1`, `Mapa 2`, `Mapa 3`... quando existirem
-- Senha da planilha compatível com a configuração interna
-- Token da API presente na aba `Menu`
 
 ## Fluxo recomendado
 
@@ -110,23 +108,28 @@ Cada arquivo `.xlsx` contém uma planilha chamada `Mapa X` com duas colunas:
 **Upload:**
 
 1. Acesse o site e envie o arquivo `BOM_Mapa_...xlsx`
-2. Configure: "Data start row" = 2, "Manufacturer Part Number" = PN1, "Quantity" = QTD
-3. Exporte o resultado em `.xls`
+2. Configure: "Row" = 2, "Manufacturer Part Number" = PN, "Quantity" = QTD
+3. Em `Priority matching` selecione `Lead Time` ou `Price` de acordo com sua preferência. Mantenha `Quantity Multiple` igual a `1`. Por fim, clique em `Create BOM` para processar o arquivo.
+4. Exporte o resultado `.xls` clicando em `Export`.
 
 **Renomear arquivo exportado:**
-
+O arquivo baixadado da LCSC estará no formato `export_project_20260421_203334.xls`.Renomeie-o para padrão:
 ```
 LCSC_Mapa_<numero_do_mapa>_Arquivo_<numero_do_arquivo>.xls
 ```
 
 Exemplo: `LCSC_Mapa_1_Arquivo_1.xls`
 
-**Regras de importação:**
+**Regras de importação do arquivo exportado na LCSC:**
 
 - O sistema abre a primeira aba do arquivo
 - Dados lidos a partir da linha 6
 - Apenas itens com `Match type = Exact Matches` são considerados
 - Colunas lidas: col. 3 (PN), col. 14 (Unit price), col. 19 (MOQ), col. 21 (Estoque), col. 25 (Match type)
+
+**IMPORTANTE:** O arquivo exportado pela LCSC tem um layout complexo, e o BudgetApp só consegue ler os dados corretamente se o formato for exatamente o esperado. Se a LCSC alterar o layout do arquivo exportado, o BudgetApp pode deixar de importar os dados corretamente até que o código seja ajustado para o novo formato.
+
+**IMPORTANTE:** Os mapas da planilha de orçamento **NÃO** podem conter filtros aplicados nas colunas, ou o sistema de importação pode falhar ao ler e processar os dados.
 
 ### DigiKey
 
@@ -134,24 +137,29 @@ Exemplo: `LCSC_Mapa_1_Arquivo_1.xls`
 
 **Upload:**
 
-1. Faça login e acesse "myList" → "Upload a list"
-2. Faça o upload, mapeando "Referência do cliente" para PN1 e "Quantity 1" para QTD
-3. Nos filtros, selecione "Matched Parts"
-4. Faça o download em CSV, incluindo: "Número de peça do fabricante", "Disponibilidade", "Quantity, Attrition, Price, Packaging...", e "Referência do cliente"
+1. Faça login e acesse "myList" → "Carregar uma lista". Selecione o arquivo `BOM_Mapa_X_Arquivo_Y.xlsx`.
+2. Faça o carregamento, mapeando "Número de peça do fabricante" para PN e "Quantity 1" para QTD, iniciando a leitura a partir da linha 2.
+3. Na próxima etapa, em `Preferências de lista`, altere o nome da lista para `DigiKey_Mapa_X_Arquivo_Y` (Altere `BOM` para `DigiKey` e remova a extensão `.xlsx`).
+4. Nos filtros, selecione "Matched Parts". `Filters` → `Matched` → `Matched Parts`
+5. Clique em `Baixar`. Altere o campo `INCLUDE` para `Peças filtradas` e `EXPORT FORMAT` para `CSV`. Inclua nos filtros SOMENTE: "Número de peça do fabricante", "Disponibilidade", "Quantity, Attrition, Price, Packaging...", e "Referência do cliente".
 
 **Renomear arquivo exportado:**
-
+Caso o nome do arquivo exportado não siga o padrão, renomeie-o para:
 ```
 Digikey_Mapa_<numero_do_mapa>_Arquivo_<numero_do_arquivo>.csv
 ```
 
 Exemplo: `Digikey_Mapa_1_Arquivo_1.csv`
 
-**Regras de importação:**
+**Regras de importação do arquivo exportado na DigiKey:**
 
 - Arquivo CSV separado por vírgula
 - Primeira linha = cabeçalho (ignorada)
 - Colunas lidas: col. 1 (MPN), col. 2 (Estoque), col. 9 (Price), col. 11 (MOQ)
+
+**IMPORTANTE:** O arquivo exportado pela DigiKey tem um layout complexo, e o BudgetApp só consegue ler os dados corretamente se o formato for exatamente o esperado. Se a DigiKey alterar o layout do arquivo exportado, o BudgetApp pode deixar de importar os dados corretamente até que o código seja ajustado para o novo formato.
+
+**IMPORTANTE:** Os mapas da planilha de orçamento **NÃO** podem conter filtros aplicados nas colunas, ou o sistema de importação pode falhar ao ler e processar os dados.
 
 ### Octopart
 
